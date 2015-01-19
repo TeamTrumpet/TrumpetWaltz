@@ -16,14 +16,18 @@ app.get(/d\/(.+)/, function(req, res) {
 
     s3.getObject(params, function(err, image_stream) {
         if (err) {
+            if (err.code == 'NoSuchKey') {
+                return res.status(404).send();
+            }
+
             console.log(err, err.stack); // an error occurred
-            return 500;
+            return res.status(500).send();
         }
 
         // Send response
         res.setHeader('Cache-Control', 'public, max-age=604800');
-        transform(image_stream.Body, req.query)
-            .pipe(res);
+        res.setHeader('Content-Type', image_stream.ContentType);
+        transform(image_stream.Body, req.query).pipe(res);
     });
 });
 
