@@ -8,11 +8,13 @@ var express = require('express'),
     AWS = require('aws-sdk'),
     s3 = new AWS.S3();
 
-app.get(/d\/(.+)/, function(req, res) {
+app.get(/d\/(.+)\/(.+)/, function(req, res) {
     var params = {
-        Bucket: config.get('BUCKET_NAME'),
-        Key: req.params[0]
+        Bucket: req.params[0],
+        Key: req.params[1]
     };
+
+    console.log("now getting bucket[" + params.Bucket + "] key[" + params.Key + "]");
 
     s3.getObject(params, function(err, image_stream) {
         if (err) {
